@@ -3,79 +3,53 @@
 <head>
 <meta charset="UTF-8">
 <title>GoE Optimizer</title>
-
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 </head>
-
 <body class="bg-gray-100 p-6">
-
 <div class="max-w-6xl mx-auto">
-
 <h1 class="text-3xl font-bold mb-6">Gift of Element OPTIMIZER for maximum Power</h1>
-
-<!-- INPUTS -->
 <div class="bg-white p-4 rounded-2xl shadow grid md:grid-cols-5 gap-4 mb-6">
-
 <div>
 <label>Gold (M)</label>
 <input id="gold" type="number" step="0.1" value="0.5" class="w-full border p-2 rounded">
 </div>
-
 <div>
 <label>Sparks (K)</label>
 <input id="sparks" type="number" step="0.1" value="5" class="w-full border p-2 rounded">
 </div>
-
 <div>
 <label>Heroes</label>
-<input id="heroes" type="number" value="3" class="w-full border p-2 rounded">
+<input id="heroes" type="number" value="10" class="w-full border p-2 rounded">
 </div>
-
 <div class="flex items-end">
-<button onclick="solve()" class="bg-black text-white px-4 py-2 rounded-xl w-full">
-RUN
-</button>
+<button onclick="solve()" class="bg-black text-white px-4 py-2 rounded-xl w-full">RUN</button>
 </div>
-
 </div>
-
-<!-- OUTPUT -->
 <div class="grid md:grid-cols-3 gap-4 mb-6">
-
 <div class="bg-white p-4 rounded-2xl shadow">
 <h3>Total Power</h3>
 <p id="power" class="text-2xl font-bold">0</p>
 </div>
-
 <div class="bg-white p-4 rounded-2xl shadow">
 <h3>Gold Left</h3>
 <p id="goldOut"></p>
 </div>
-
 <div class="bg-white p-4 rounded-2xl shadow">
 <h3>Sparks Left</h3>
 <p id="sparkOut"></p>
 </div>
-
 </div>
-
-<!-- HERO RESULT -->
 <div class="bg-white p-4 rounded-2xl shadow mb-6">
-<h3 class="font-semibold mb-2">Hero Allocation (FINAL BUILD)</h3>
+<h3 class="font-semibold mb-2">Hero Allocation</h3>
 <div id="result"></div>
 </div>
-
-<!-- CHART -->
 <div class="bg-white p-4 rounded-2xl shadow">
 <canvas id="chart"></canvas>
 </div>
-
 </div>
 
 <script>
-
 const levels = [
 {level:1,gold:7000,sparks:250,power:22},
 {level:2,gold:7500,sparks:260,power:22},
@@ -109,104 +83,97 @@ const levels = [
 {level:30,gold:725000,sparks:4600,power:242}
 ];
 
-// scaling
-const gStep = 10000;
-const sStep = 100;
+let chartInstance=null;
 
-function solve() {
-
-let G = Math.floor(+gold.value * 1_000_000);
-let S = Math.floor(+sparks.value * 1_000);
+async function solve(){
+let G = Math.floor(+gold.value*1_000_000);
+let S = Math.floor(+sparks.value*1_000);
 let H = +heroes.value;
+const allowGoldNegative = true;
 
-let WG = Math.floor(G / gStep);
-let WS = Math.floor(S / sStep);
+const gStep=50000;
+const sStep=50;
 
-// DP table
-let dp = Array.from({length: WG+1}, ()=>Array(WS+1).fill(0));
+let WG = Math.floor(G/gStep);
+let WS = Math.floor(S/sStep);
 
-// parent tracking for backtracking
-let parent = Array.from({length: WG+1}, ()=>Array(WS+1).fill(null));
+// 2D DP: dp[g][s] = max power
+let dp = Array.from({length:WG+1},()=>Array(WS+1).fill(0));
+let parent = Array.from({length:WG+1},()=>Array(WS+1).fill(null));
 
-// build items
+// Build per-hero items
 let items = [];
-
-for (let h=0; h<H; h++) {
-for (let i=0; i<levels.length; i++) {
-let u = levels[i];
-
-items.push({
-hero: h,
-level: i,
-g: Math.floor(u.gold/gStep),
-s: Math.floor(u.sparks/sStep),
-p: u.power
-});
-}
+for(let h=0; h<H; h++){
+  for(let i=0; i<levels.length; i++){
+    let u=levels[i];
+    items.push({
+      hero:h,
+      level:i,
+      g:Math.floor(u.gold/gStep),
+      s:Math.floor(u.sparks/sStep),
+      p:u.power
+    });
+  }
 }
 
-// DP
-for (let item of items) {
-for (let g=WG; g>=item.g; g--) {
-for (let s=WS; s>=item.s; s--) {
-
-let val = dp[g-item.g][s-item.s] + item.p;
-
-if (val > dp[g][s]) {
-dp[g][s] = val;
-parent[g][s] = item;
+// Standard 0-1 Knapsack with 2D constraints
+for(let item of items){
+  for(let g=WG; g>=item.g; g--){
+    for(let s=WS; s>=item.s; s--){
+      let prevG=g-item.g;
+      let prevS=s-item.s;
+      if(!allowGoldNegative && prevG<0) continue;
+      if(prevG<0) prevG=0;
+      let val=dp[prevG][prevS]+item.p;
+      if(val>dp[g][s]){
+        dp[g][s]=val;
+        parent[g][s]=item;
+      }
+    }
+  }
 }
 
-}
-}
-}
-
-// BACKTRACK
-let g = WG, s = WS;
-
-let heroLevels = Array(H).fill(0);
-let used = [];
-
-while (g >= 0 && s >= 0 && parent[g][s]) {
-
-let it = parent[g][s];
-
-heroLevels[it.hero] = Math.max(heroLevels[it.hero], it.level);
-
-g -= it.g;
-s -= it.s;
-
-used.push(it);
+// Backtrack
+let g=WG, s=WS;
+let heroLevels=Array(H).fill(-1);
+while(g>=0 && s>=0 && parent[g][s]){
+  let it=parent[g][s];
+  heroLevels[it.hero]=Math.max(heroLevels[it.hero],it.level);
+  g-=it.g;
+  s-=it.s;
 }
 
-// OUTPUT
-let totalPower = dp[WG][WS];
+let usedGold=0, usedSparks=0;
+for(let h=0; h<H; h++){
+  let lvl=heroLevels[h];
+  if(lvl<0) continue;
+  let u=levels[lvl];
+  usedGold+=u.gold;
+  usedSparks+=u.sparks;
+}
 
-power.innerText = totalPower;
+power.innerText=dp[WG][WS];
+goldOut.innerText=(G-usedGold).toLocaleString();
+sparkOut.innerText=(S-usedSparks).toLocaleString();
 
-goldOut.innerText = (G - WG*gStep).toFixed(0);
-sparkOut.innerText = (S - WS*sStep).toFixed(0);
-
-// HERO SUMMARY
-result.innerHTML = heroLevels
-.map((lvl,i)=>`<div>Hero ${i+1} → Level ${lvl+1}</div>`)
-.join("");
+result.innerHTML=heroLevels.map((lvl,i)=>`<div>Hero ${i+1} → Level ${lvl+1}</div>`).join("");
 
 // chart
-new Chart(document.getElementById("chart"), {
-type: "line",
-data: {
-labels: Array.from({length:10},(_,i)=>i+1),
-datasets: [{
-label: "Optimal Power Curve",
-data: Array.from({length:10},(_,i)=>totalPower*(i+1)/10)
-}]
+let dataPoints=Array.from({length:10},(_,i)=>dp[WG][WS]*(i+1)/10);
+if(!chartInstance){
+  chartInstance=new Chart(document.getElementById("chart"),{
+    type:'line',
+    data:{
+      labels:Array.from({length:10},(_,i)=>i+1),
+      datasets:[{label:"Optimal Power Curve",data:dataPoints}]
+    }
+  });
+}else{
+  chartInstance.data.datasets[0].data=dataPoints;
+  chartInstance.update();
 }
-});
 
 }
-
 </script>
-
 </body>
 </html>
