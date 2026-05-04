@@ -30,7 +30,17 @@ const levels = [
 {gold:252500,sparks:2380,power:154},
 {gold:266500,sparks:2460,power:154},
 {gold:280500,sparks:2540,power:154},
-{gold:294500,sparks:2620,power:154}
+{gold:294500,sparks:2620,power:154},
+{gold:405500,sparks:3200,power:198},
+{gold:426000,sparks:3300,power:198},
+{gold:447000,sparks:3400,power:198},
+{gold:468500,sparks:3500,power:198},
+{gold:490000,sparks:3600,power:198},
+{gold:627000,sparks:4200,power:242},
+{gold:650000,sparks:4300,power:242},
+{gold:675500,sparks:4400,power:242},
+{gold:700000,sparks:4500,power:242},
+{gold:725000,sparks:4600,power:242}
 ];
 
 // sparse DP (FAST ENGINE)
