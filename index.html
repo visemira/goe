@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hero Upgrade Data</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    pre {
+      background: #f4f4f4;
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Hero Upgrade Data (JSON)</h2>
+
+<pre id="output"></pre>
+
+<script>
+const heroData = [
+  { level: 1, gold: 7000, sparks: 250, power: 22 },
+  { level: 2, gold: 7500, sparks: 260, power: 22 },
+  { level: 3, gold: 8000, sparks: 270, power: 22 },
+  { level: 4, gold: 8000, sparks: 280, power: 22 },
+  { level: 5, gold: 8500, sparks: 290, power: 22 },
+
+  { level: 6, gold: 44000, sparks: 800, power: 66 },
+  { level: 7, gold: 47500, sparks: 840, power: 66 },
+  { level: 8, gold: 51500, sparks: 880, power: 66 },
+  { level: 9, gold: 55000, sparks: 920, power: 66 },
+  { level: 10, gold: 59000, sparks: 960, power: 66 },
+
+  { level: 11, gold: 120500, sparks: 1500, power: 110 },
+  { level: 12, gold: 128500, sparks: 1560, power: 110 },
+  { level: 13, gold: 136500, sparks: 1620, power: 110 },
+  { level: 14, gold: 144500, sparks: 1680, power: 110 },
+  { level: 15, gold: 153000, sparks: 1740, power: 110 },
+
+  { level: 16, gold: 239000, sparks: 2300, power: 154 },
+  { level: 17, gold: 252500, sparks: 2380, power: 154 },
+  { level: 18, gold: 266500, sparks: 2460, power: 154 },
+  { level: 19, gold: 280500, sparks: 2540, power: 154 },
+  { level: 20, gold: 294500, sparks: 2620, power: 154 },
+
+  { level: 21, gold: 405500, sparks: 3200, power: 198 },
+  { level: 22, gold: 426000, sparks: 3300, power: 198 },
+  { level: 23, gold: 447000, sparks: 3400, power: 198 },
+  { level: 24, gold: 468500, sparks: 3500, power: 198 },
+  { level: 25, gold: 490000, sparks: 3600, power: 198 },
+
+  { level: 26, gold: 627000, sparks: 4200, power: 242 },
+  { level: 27, gold: 650000, sparks: 4300, power: 242 },
+  { level: 28, gold: 675500, sparks: 4400, power: 242 },
+  { level: 29, gold: 700000, sparks: 4500, power: 242 },
+  { level: 30, gold: 725000, sparks: 4600, power: 242 }
+];
+
+// Example: compute efficiency
+const dataWithEfficiency = heroData.map(d => ({
+  ...d,
+  efficiency: d.power / (d.gold + d.sparks)
+}));
+
+// Display JSON
+document.getElementById("output").textContent =
+  JSON.stringify(dataWithEfficiency, null, 2);
+
+// Also log to console
+console.log(dataWithEfficiency);
+</script>
+
+</body>
+</html>
