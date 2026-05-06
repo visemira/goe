@@ -10,6 +10,7 @@ self.onmessage = function(e) {
 
   // Sample data (replace with full game dataset)
   const levels = [
+    {gold:0,sparks:0,power:0},
     {gold:7000,sparks:250,power:22},
     {gold:7500,sparks:260,power:22},
     {gold:8000,sparks:270,power:22},
