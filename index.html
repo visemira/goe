@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GoE Optimizer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h1>GoE Upgrade Optimizer</h1>
+
+  <div class="panel">
+
+    <label>Gold</label>
+    <input id="gold" type="number" value="0">
+
+    <label>Spark</label>
+    <input id="spark" type="number" value="0">
+
+    <label>Mode</label>
+    <select id="mode">
+      <option value="max">Max Power (No Limit)</option>
+      <option value="opt">Optimal (Constraints)</option>
+      <option value="spark">Spark Fixed</option>
+    </select>
+
+    <button onclick="run()">Calculate</button>
+  </div>
+
+  <pre id="output"></pre>
+
+  <script src="app.js"></script>
+</body>
+</html>
