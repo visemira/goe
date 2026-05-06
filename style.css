@@ -1,1 +1,36 @@
 
+body {
+  font-family: Arial;
+  background: #0f172a;
+  color: #fff;
+  padding: 20px;
+}
+
+h1 {
+  color: #38bdf8;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  max-width: 300px;
+  gap: 10px;
+}
+
+input, select {
+  padding: 8px;
+}
+
+button {
+  padding: 10px;
+  background: #22c55e;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+pre {
+  margin-top: 20px;
+  background: #1e293b;
+  padding: 15px;
+}
